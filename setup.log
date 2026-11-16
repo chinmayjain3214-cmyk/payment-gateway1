@@ -1,0 +1,115 @@
+
+===== 2026-11-16 07:50:36 =====
+Invoice agent - local database setup
+=====================================
+[ OK ] .env already has the database settings
+Installing PostgreSQL 17 with winget. This downloads about 350 MB
+and can take several minutes.
+>>> Windows will ask for administrator permission. Click YES. <<<
+$ winget install --id PostgreSQL.PostgreSQL.17 (password hidden)
+Found PostgreSQL 17 [PostgreSQL.PostgreSQL.17] Version 17.12-1
+This application is licensed to you by its owner.
+Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Downloading https://get.enterprisedb.com/postgresql/postgresql-17.12-1-windows-x64.exe
+An unexpected error occurred while executing the command: 
+Download request status is not success.
+0x80190193 : Forbidden (403).
+[FAIL] PostgreSQL installation did not finish (winget exit code 2149122451).
+
+===== 2026-11-16 07:53:45 =====
+Invoice agent - local database setup
+=====================================
+[ OK ] .env already has the database settings
+Looking up the official PostgreSQL 17 installer in winget ...
+Downloading https://get.enterprisedb.com/postgresql/postgresql-17.12-1-windows-x64.exe
+(about 400 MB; it resumes automatically if the connection drops)
+curl attempt 1 exit code 0
+[ OK ] Installer downloaded and verified (SHA256 matches winget)
+
+>>> Windows will now ask for administrator permission. Click YES. <<<
+Installing PostgreSQL 17 - this takes a few minutes, please wait ...
+$ Start-Process postgresql-17.12-1-windows-x64.exe (elevated, password hidden)
+installer exit code 0
+[ OK ] PostgreSQL is installed
+Waiting for the PostgreSQL server on localhost:5432 ...
+[ OK ] PostgreSQL server is running
+[ OK ] Logged in to PostgreSQL
+
+----- python db_setup.py -----
+$ C:\Users\Chinx\OneDrive - JK LAKSHMIPAT UNIVERSITY\Desktop\invoice-agent-main\.venv\Scripts\python.exe db_setup.py
+Database 'invoice_db' created successfully!
+All database tables created successfully from schema.sql!
+
+----- python setup_agent_tables.py -----
+$ C:\Users\Chinx\OneDrive - JK LAKSHMIPAT UNIVERSITY\Desktop\invoice-agent-main\.venv\Scripts\python.exe setup_agent_tables.py
+Applied: schema.sql
+Applied: schema_agent.sql
+Applied: approval workflow schema
+Database setup completed successfully.
+Available tables:
+ - agent_log
+ - approval_requests
+ - approval_workflow_stages
+ - audit_logs
+ - goods_receipts
+ - invoices
+ - payment_schedules
+ - purchase_orders
+ - users
+ - vendors
+All required database tables are present.
+
+----- python seed_users.py -----
+$ C:\Users\Chinx\OneDrive - JK LAKSHMIPAT UNIVERSITY\Desktop\invoice-agent-main\.venv\Scripts\python.exe seed_users.py
+Ready: vendor account: vendor1
+Ready: procurement_officer account: procurement1
+Ready: department_head account: depthead1
+Ready: finance_officer account: finance1
+Ready: approver account: approver1
+Ready: admin account: admin1
+All 6 demo accounts are ready.
+
+----- python seed_db.py -----
+$ C:\Users\Chinx\OneDrive - JK LAKSHMIPAT UNIVERSITY\Desktop\invoice-agent-main\.venv\Scripts\python.exe seed_db.py
+Connected to PostgreSQL successfully. Starting data seeding...
+✓ Reset existing tables.
+✓ Seeded 5 Vendors.
+✓ Seeded 10 Purchase Orders.
+✓ Seeded 10 Goods Receipts.
+✓ Seeded 7 Test & Trap Invoices.
+🚀 Database seeding completed successfully with normal records and trap cases!
+
+----- python check_setup.py -----
+$ C:\Users\Chinx\OneDrive - JK LAKSHMIPAT UNIVERSITY\Desktop\invoice-agent-main\.venv\Scripts\python.exe check_setup.py
+Preflight check before the demo
+Settings
+[FAIL] GEMINI_API_KEY is missing in .env
+[ OK ] DB_PASSWORD is set
+[ OK ] Main model: gemini-3.1-flash-lite (default)
+[WARN] No FALLBACK_MODEL in .env, so a busy main model has no backup.
+[ OK ] .env is listed in .gitignore, so your keys stay private
+Files
+[ OK ] 13 demo invoices in the invoices folder
+[ OK ] 9 invoice readings saved in the extracted folder (demo works even if Gemini is slow)
+Database
+[ OK ] Connected to PostgreSQL
+[ OK ] Table vendors exists
+[ OK ] Table purchase_orders exists
+[ OK ] Table goods_receipts exists
+[ OK ] Table invoices exists
+[ OK ] Table audit_logs exists
+[ OK ] Table agent_log exists
+[ OK ] Table approval_requests exists
+[ OK ] Table users exists
+[ OK ] The vendor demo account exists
+[ OK ] The approver demo account exists
+[ OK ] The admin demo account exists
+Gemini
+[WARN] Skipped, because there is no key
+App
+[ OK ] Streamlit 1.66.1 is installed
+1 problem(s) to fix before the demo.
+[FAIL] check_setup.py exited with code 1
+
+Database setup finished. Close any old app window and start run_app.bat.
+Note: add your GEMINI_API_KEY to .env so the AI invoice reading works.
